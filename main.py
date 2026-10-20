@@ -2,8 +2,19 @@ from fastapi import FastAPI
 from models import DocumentCreate
 from database import documents
 import services
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173"
+    ],  # Allow the frontend to access to the backend
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow GET, POST, etc.
+    allow_headers=["*"],
+)
 
 
 # When a GET request hits the root path "/", FastAPI runs this function,
