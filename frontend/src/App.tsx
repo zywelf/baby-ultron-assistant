@@ -10,6 +10,7 @@ function App() {
   const [docs, setDocs] = useState<DocumentItem[]>([])
   const [title, setTitle] = useState<string>('')
   const [content, setContent] = useState<string>('')
+  const [error, setError] = useState<string>('')
 
   useEffect(() => {
     async function loadDocs() {
@@ -25,8 +26,13 @@ function App() {
   }, [])
 
   async function handleCreate() {
+    if (title.trim() === '') {
+      setError('Il titolo è obbligatorio')
+      return
+    }
+    setError('')
     try {
-      const newDoc: Omit<DocumentItem, 'id'> = { title, content }
+      const newDoc: Omit<DocumentItem, 'id'> = { title: title.trim(), content }
       const res = await fetch('http://localhost:8000/documents', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -62,13 +68,17 @@ function App() {
             placeholder="Titolo"
             className="bg-zinc-950 border border-zinc-700 rounded px-3 py-2 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-red-500"
           />
+          {error && <p className='text-red-500 text-sm'>{error}</p>}
           <input
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="Contenuto"
             className="bg-zinc-950 border border-zinc-700 rounded px-3 py-2 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-red-500"
           />
-          <button className="bg-red-600 text-white rounded px-4 py-2 font-medium hover:bg-red-500 transition self-start uppercase tracking-wide text-sm">
+          <button
+            disabled={title.trim() === ''}
+            className="bg-red-600 text-white rounded px-4 py-2 font-medium hover:bg-red-500 transition self-start uppercase tracking-wide text-sm disabled:cursor-not-allowed disabled:opacity-50"
+          >
             Crea
           </button>
         </form>
