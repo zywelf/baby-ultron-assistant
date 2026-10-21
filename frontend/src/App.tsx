@@ -12,15 +12,21 @@ function App() {
   const [content, setContent] = useState<string>('')
   const [error, setError] = useState<string>('')
   const [editingId, setEditingId] = useState<number | null>(null)
+  const [loading, setLoading] = useState<boolean>(true)
+  const [loadError, setLoadError] = useState<string>('')
 
   useEffect(() => {
     async function loadDocs() {
       try {
         const res = await fetch('http://localhost:8000/documents')
         const data = await res.json()
+        setLoadError('')
         setDocs(data.documents)
       } catch (error) {
         console.error(error)
+        setLoadError('Impossibile caricare i documenti.')
+      } finally {
+        setLoading(false)
       }
     }
     loadDocs()
@@ -129,7 +135,7 @@ function App() {
             </button>
             {editingId !== null && (
               <button
-                type='button'
+                type="button"
                 onClick={() => {
                   setEditingId(null)
                   setTitle('')
@@ -143,31 +149,39 @@ function App() {
           </div>
         </form>
 
-        <ul className="flex flex-col gap-3">
-          {docs.map((doc) => (
-            <li
-              key={doc.id}
-              className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 hover:border-red-500/50 transition"
-            >
-              <h2 className="font-semibold text-zinc-100">{doc.title}</h2>
-              <p className="text-zinc-400 text-sm mt-1">{doc.content}</p>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => handleDelete(doc.id)}
-                  className="mt-2 text-red-500 text-sm hover:text-red-400"
-                >
-                  Elimina
-                </button>
-                <button
-                  onClick={() => startEdit(doc)}
-                  className="mt-2 text-blue-500 text-sm hover:text-blue-400"
-                >
-                  Modifica
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
+        {loading ? (
+          <div className="flex justify-center py-10">
+            <div className="h-8 w-8 border-4 border-zinc-700 border-t-red-500 rounded-full animate-spin"></div>
+          </div>
+        ) : loadError ? (
+          <p className="text-red-500 text-center py-10">{loadError}</p>
+        ) : (
+          <ul className="flex flex-col gap-3">
+            {docs.map((doc) => (
+              <li
+                key={doc.id}
+                className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 hover:border-red-500/50 transition"
+              >
+                <h2 className="font-semibold text-zinc-100">{doc.title}</h2>
+                <p className="text-zinc-400 text-sm mt-1">{doc.content}</p>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleDelete(doc.id)}
+                    className="mt-2 text-red-500 text-sm hover:text-red-400"
+                  >
+                    Elimina
+                  </button>
+                  <button
+                    onClick={() => startEdit(doc)}
+                    className="mt-2 text-blue-500 text-sm hover:text-blue-400"
+                  >
+                    Modifica
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </div>
   )
