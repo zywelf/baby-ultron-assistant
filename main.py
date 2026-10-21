@@ -43,3 +43,13 @@ def search_documents(keyword: str):
 @app.post("/documents", status_code=201)
 def create_document(doc: DocumentCreate):
     return services.create_document(doc)
+
+
+@app.delete("/documents/{doc_id}", status_code=204)
+def delete_document(doc_id: int):
+    return services.delete_document(doc_id)
+
+
+@app.put("/documents/{doc_id}")
+def update_document(doc_id: int, doc: DocumentCreate):
+    return services.update_document(doc_id, doc)
